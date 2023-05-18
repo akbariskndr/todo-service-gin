@@ -19,7 +19,7 @@ func InitRoutes() *gin.Engine {
 
 	authMiddleware := middleware.CreateAuthMiddleware()
 
-	AddTodoRoutes(v1, todo.Controller)
+	AddTodoRoutes(v1, todo.Controller, authMiddleware)
 	AddAuthRoutes(v1, auth.Controller, authMiddleware)
 
 	return router

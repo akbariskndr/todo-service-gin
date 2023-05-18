@@ -16,7 +16,7 @@ func CreateAuthMiddleware() *jwt.GinJWTMiddleware {
 	auth := auth_module.GetInstance()
 
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
-		Realm:       "test zone",
+		Realm:       "todo-service",
 		Key:         []byte(os.Getenv("DB_USERNAME")),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
@@ -55,21 +55,20 @@ func CreateAuthMiddleware() *jwt.GinJWTMiddleware {
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{
 				"code":    code,
-				"message": message,
+				"message": "You are not authorized",
 			})
 		},
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		TimeFunc:      time.Now,
 	})
+
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	errInit := authMiddleware.MiddlewareInit()
-
-	if errInit != nil {
-		log.Fatal("authMiddleware.MiddlewareInit() Error:" + errInit.Error())
+	if err := authMiddleware.MiddlewareInit(); err != nil {
+		log.Fatal("authMiddleware.MiddlewareInit() Error:" + err.Error())
 	}
 
 	return authMiddleware
