@@ -5,6 +5,7 @@ import (
 	"akbariskndr/todo-service-gin/modules/auth/controller"
 	"akbariskndr/todo-service-gin/modules/auth/repository"
 	"akbariskndr/todo-service-gin/modules/auth/service"
+	"sync"
 )
 
 type AuthModule struct {
@@ -13,7 +14,11 @@ type AuthModule struct {
 	Controller  *controller.AuthController
 }
 
-func InitModule() *AuthModule {
+var lock = &sync.Mutex{}
+
+var singleton *AuthModule
+
+func createInstance() *AuthModule {
 	var userRepository *repository.UserRepository = &repository.UserRepository{
 		DB: database.Connector,
 	}
@@ -29,4 +34,18 @@ func InitModule() *AuthModule {
 		UserService: authService,
 		Controller:  authController,
 	}
+}
+
+func GetInstance() *AuthModule {
+	if singleton == nil {
+		lock.Lock()
+
+		defer lock.Unlock()
+
+		if singleton == nil {
+			singleton = createInstance()
+		}
+	}
+
+	return singleton
 }

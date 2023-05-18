@@ -14,8 +14,8 @@ func InitRoutes() *gin.Engine {
 	v1 := router.Group("v1")
 	AddPingRoutes(v1)
 
-	todo := todo_module.InitModule()
-	auth := auth_module.InitModule()
+	todo := todo_module.GetInstance()
+	auth := auth_module.GetInstance()
 
 	authMiddleware := middleware.CreateAuthMiddleware()
 

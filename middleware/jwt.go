@@ -13,7 +13,8 @@ import (
 )
 
 func CreateAuthMiddleware() *jwt.GinJWTMiddleware {
-	auth := auth_module.InitModule()
+	auth := auth_module.GetInstance()
+
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte(os.Getenv("DB_USERNAME")),
