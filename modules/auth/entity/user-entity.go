@@ -2,11 +2,16 @@ package entity
 
 import "time"
 
-type Todo struct {
+type UserEntity struct {
 	ID        uint       `json:"id" gorm:"primaryKey"`
-	Title     string     `json:"title"`
-	Completed bool       `json:"completed"`
+	Name      string     `json:"name"`
+	Email     string     `json:"email"`
+	Password  string     `json:"-"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at" gorm:"index"`
+}
+
+func (UserEntity) TableName() string {
+	return "users"
 }

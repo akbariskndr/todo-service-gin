@@ -1,7 +1,8 @@
 package database
 
 import (
-	"akbariskndr/todo-service-gin/entity"
+	user_entity "akbariskndr/todo-service-gin/modules/auth/entity"
+	todo_entity "akbariskndr/todo-service-gin/modules/todo/entity"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -15,10 +16,12 @@ func Connect(connectionString string) error {
 	Connector, err = gorm.Open(mysql.New(mysql.Config{
 		DSN: connectionString,
 	}), &gorm.Config{})
+
 	if err != nil {
 		return err
 	}
-	Connector.AutoMigrate(&entity.Todo{})
+	Connector.AutoMigrate(&todo_entity.TodoEntity{})
+	Connector.AutoMigrate(&user_entity.UserEntity{})
 	log.Println("Connected to database")
 
 	return nil
