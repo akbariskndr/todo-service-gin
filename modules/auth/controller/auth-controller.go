@@ -37,6 +37,7 @@ func (controller AuthController) Me(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"data": user})
 }
 
+// TODO: Implement change password
 func (controller AuthController) ChangePassword(c *gin.Context) {
 	users := controller.Service.FindAll()
 
