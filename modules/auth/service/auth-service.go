@@ -50,17 +50,21 @@ func (service AuthService) Update(id string, payload entity.UserEntity) *entity.
 	return service.Repository.Update(id, payload)
 }
 
-func (service AuthService) ChangePassword(id uint, payload entity.UserEntity) *entity.UserEntity {
+func (service AuthService) ChangePassword(id uint, payload *dto.ChangePasswordDto) *entity.UserEntity {
 	user := service.Repository.FindOne(id)
 
 	if user == nil {
 		return nil
 	}
 
-	password := []byte(payload.Password)
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password)); err != nil {
+		return nil
+	}
+
+	password := []byte(payload.NewPassword)
 	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	service.Repository.ChangePassword(id, string(hashedPassword))

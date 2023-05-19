@@ -2,6 +2,7 @@ package controller
 
 import (
 	"akbariskndr/todo-service-gin/modules/auth/controller/dto"
+	"akbariskndr/todo-service-gin/modules/auth/entity"
 	"akbariskndr/todo-service-gin/modules/auth/service"
 	"net/http"
 
@@ -37,9 +38,18 @@ func (controller AuthController) Me(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"data": user})
 }
 
-// TODO: Implement change password
 func (controller AuthController) ChangePassword(c *gin.Context) {
-	users := controller.Service.FindAll()
+	var payload dto.ChangePasswordDto
 
-	c.IndentedJSON(http.StatusOK, gin.H{"data": users})
+	if err := c.ShouldBindWith(&payload, binding.JSON); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	user, _ := c.Get("id")
+	if res := controller.Service.ChangePassword(user.(*entity.UserEntity).ID, &payload); res == nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not found"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"data": user})
 }
