@@ -11,7 +11,8 @@ import (
 )
 
 type AuthController struct {
-	Service *service.AuthService
+	AuthService *service.AuthService
+	UserService *service.UserService
 }
 
 func (controller AuthController) Register(c *gin.Context) {
@@ -22,12 +23,12 @@ func (controller AuthController) Register(c *gin.Context) {
 		return
 	}
 
-	if user := controller.Service.FindByEmail(payload.Email); user != nil {
+	if user := controller.UserService.FindByEmail(payload.Email); user != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "User already registered with that email"})
 		return
 	}
 
-	user := controller.Service.Register(&payload)
+	user := controller.AuthService.Register(&payload)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"data": user})
 }
@@ -46,10 +47,28 @@ func (controller AuthController) ChangePassword(c *gin.Context) {
 		return
 	}
 	user, _ := c.Get("id")
-	if res := controller.Service.ChangePassword(user.(*entity.UserEntity).ID, &payload); res == nil {
+	if res := controller.AuthService.ChangePassword(user.(*entity.UserEntity).ID, &payload); res == nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not found"})
 		return
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"data": user})
+}
+
+func (controller AuthController) ForgotPasword(c *gin.Context) {
+	var payload dto.ForgotPasswordDto
+
+	if err := c.ShouldBindWith(&payload, binding.JSON); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	result := controller.AuthService.ForgotPassword(payload.Email)
+
+	if result == nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Not found"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Check your email"})
 }

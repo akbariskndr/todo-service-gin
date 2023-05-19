@@ -8,9 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes() *gin.Engine {
-	var router = gin.Default()
-
+func InitRoutes(router *gin.Engine) {
 	v1 := router.Group("v1")
 	AddPingRoutes(v1)
 
@@ -21,6 +19,4 @@ func InitRoutes() *gin.Engine {
 
 	AddTodoRoutes(v1, todo.Controller, authMiddleware)
 	AddAuthRoutes(v1, auth.Controller, authMiddleware)
-
-	return router
 }

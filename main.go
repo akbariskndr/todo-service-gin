@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -22,6 +23,8 @@ func main() {
 		panic(err.Error())
 	}
 
-	router := routes.InitRoutes()
+	router := gin.Default()
+
+	routes.InitRoutes(router)
 	router.Run("localhost:8080")
 }

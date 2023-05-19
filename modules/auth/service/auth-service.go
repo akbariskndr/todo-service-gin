@@ -1,6 +1,8 @@
 package service
 
 import (
+	"akbariskndr/todo-service-gin/lib/mailer"
+	"akbariskndr/todo-service-gin/lib/view"
 	"akbariskndr/todo-service-gin/modules/auth/controller/dto"
 	"akbariskndr/todo-service-gin/modules/auth/entity"
 	"akbariskndr/todo-service-gin/modules/auth/repository"
@@ -10,14 +12,6 @@ import (
 
 type AuthService struct {
 	Repository *repository.UserRepository
-}
-
-func (service AuthService) FindAll() []entity.UserEntity {
-	return service.Repository.FindAll()
-}
-
-func (service AuthService) FindOne(id uint) *entity.UserEntity {
-	return service.Repository.FindOne(id)
 }
 
 func (service AuthService) Register(payload *dto.RegisterDto) *entity.UserEntity {
@@ -35,19 +29,15 @@ func (service AuthService) Register(payload *dto.RegisterDto) *entity.UserEntity
 func (service AuthService) Login(payload *dto.LoginDto) *entity.UserEntity {
 	user := service.Repository.FindByEmail(payload.Email)
 
+	if user == nil {
+		return nil
+	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password)); err != nil {
 		return nil
 	}
 
 	return user
-}
-
-func (service AuthService) FindByEmail(email string) *entity.UserEntity {
-	return service.Repository.FindByEmail(email)
-}
-
-func (service AuthService) Update(id string, payload entity.UserEntity) *entity.UserEntity {
-	return service.Repository.Update(id, payload)
 }
 
 func (service AuthService) ChangePassword(id uint, payload *dto.ChangePasswordDto) *entity.UserEntity {
@@ -72,6 +62,23 @@ func (service AuthService) ChangePassword(id uint, payload *dto.ChangePasswordDt
 	return user
 }
 
-func (service AuthService) Delete(id string) *entity.UserEntity {
-	return service.Repository.Delete(id)
+func (service AuthService) ForgotPassword(email string) *entity.UserEntity {
+	user := service.Repository.FindByEmail(email)
+
+	if user == nil {
+		return nil
+	}
+
+	to := []string{user.Email}
+	subject := "Reset Password"
+
+	view := view.Get("forgot-password.html")
+
+	mailer.CreateBuilder().
+		To(&to).
+		Subject(&subject).
+		Html(view.GetHtml()).
+		Send()
+
+	return user
 }

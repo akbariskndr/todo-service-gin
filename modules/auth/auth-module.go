@@ -10,7 +10,8 @@ import (
 
 type AuthModule struct {
 	Repository  *repository.UserRepository
-	UserService *service.AuthService
+	AuthService *service.AuthService
+	UserService *service.UserService
 	Controller  *controller.AuthController
 }
 
@@ -25,13 +26,18 @@ func createInstance() *AuthModule {
 	var authService *service.AuthService = &service.AuthService{
 		Repository: userRepository,
 	}
+	var userService *service.UserService = &service.UserService{
+		Repository: userRepository,
+	}
 	var authController *controller.AuthController = &controller.AuthController{
-		Service: authService,
+		AuthService: authService,
+		UserService: userService,
 	}
 
 	return &AuthModule{
 		Repository:  userRepository,
-		UserService: authService,
+		UserService: userService,
+		AuthService: authService,
 		Controller:  authController,
 	}
 }

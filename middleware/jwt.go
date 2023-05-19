@@ -39,7 +39,7 @@ func CreateAuthMiddleware() *jwt.GinJWTMiddleware {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			if user := auth.UserService.Login(&payload); user != nil {
+			if user := auth.AuthService.Login(&payload); user != nil {
 				return user, nil
 			}
 

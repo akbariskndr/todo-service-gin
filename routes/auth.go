@@ -15,4 +15,6 @@ func AddAuthRoutes(rg *gin.RouterGroup, controller *controller.AuthController, a
 	router.POST("/login", authMiddleware.LoginHandler)
 	router.GET("/refresh-token", authMiddleware.RefreshHandler)
 	router.PATCH("/change-password", authMiddleware.MiddlewareFunc(), controller.ChangePassword)
+	router.POST("/forgot-password", controller.ForgotPasword)
+
 }
